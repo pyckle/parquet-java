@@ -452,19 +452,7 @@ abstract class ColumnReaderBase implements ColumnReader {
     this.converter = Objects.requireNonNull(converter, "converter cannot be null");
     this.writerVersion = writerVersion;
     this.maxDefinitionLevel = path.getMaxDefinitionLevel();
-    DictionaryPage dictionaryPage = pageReader.readDictionaryPage();
-    if (dictionaryPage != null) {
-      try {
-        this.dictionary = dictionaryPage.getEncoding().initDictionary(path, dictionaryPage);
-        if (converter.hasDictionarySupport()) {
-          converter.setDictionary(dictionary);
-        }
-      } catch (IOException e) {
-        throw new ParquetDecodingException("could not decode the dictionary for " + path, e);
-      }
-    } else {
-      this.dictionary = null;
-    }
+    this.dictionary = pageReader.getDictionary(path);
     this.totalValueCount = pageReader.getTotalValueCount();
     if (totalValueCount <= 0) {
       throw new ParquetDecodingException("totalValueCount '" + totalValueCount + "' <= 0");
